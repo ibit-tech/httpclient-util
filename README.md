@@ -1,4 +1,4 @@
-### Usage bout HttpClientUtil
+### Usage about HttpClientUtil
 
 HttpClientUtil encapsulates the code to use HttpClient much easier.
 
