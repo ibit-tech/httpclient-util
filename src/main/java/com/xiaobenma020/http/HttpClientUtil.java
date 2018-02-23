@@ -124,6 +124,7 @@ public class HttpClientUtil {
                 .setSSLSocketFactory(createSSLConnSocketFactory())
                 .setConnectionManager(connMgr)
                 .setDefaultRequestConfig(requestConfig)
+                .setConnectionManagerShared(true)
                 .build();
     }
 
