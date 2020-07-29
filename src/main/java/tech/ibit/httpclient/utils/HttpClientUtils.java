@@ -1,7 +1,11 @@
 package tech.ibit.httpclient.utils;
 
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
+import org.apache.http.HeaderElementIterator;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -67,6 +71,12 @@ public class HttpClientUtils {
     }
 
     /**
+     * 私有构造方法
+     */
+    private HttpClientUtils() {
+    }
+
+    /**
      * 初始化
      */
     private static void init() {
@@ -80,6 +90,9 @@ public class HttpClientUtils {
      * @param dnsResolver dns处理
      */
     public static void init(HttpClientProperties properties, DnsResolver dnsResolver) {
+
+        // 重新初始化，先关闭已有的连接
+        closeClient();
 
         // 支持http和https
         Registry<ConnectionSocketFactory> socketFactoryRegistry =
@@ -132,6 +145,19 @@ public class HttpClientUtils {
     }
 
     /**
+     * 关闭client
+     */
+    private static void closeClient() {
+        if (null != httpClient) {
+            try {
+                httpClient.close();
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+    }
+
+    /**
      * 配置keep-alive策略
      *
      * @return keep-alive策略
@@ -152,17 +178,12 @@ public class HttpClientUtils {
         };
     }
 
-    /**
-     * 私有构造方法
-     */
-    private HttpClientUtils() {
-    }
 
     /**
      * 执行请求
      *
      * @param request      request object
-     * @param convert2Text 是否将结果转换为文本，是：content为文本，否则为HttpEntity
+     * @param convert2Text 是否将结果转换为文本，是：content为文本，否则为byte[]
      * @return response
      */
     public static Response doRequest(Request request, boolean convert2Text) {
@@ -212,9 +233,9 @@ public class HttpClientUtils {
     private static Response getResponse(HttpUriRequest request
             , String defaultCharset, boolean convert2Text) throws IOException {
 
-        try (CloseableHttpClient httpClient = getHttpClient()) {
-            HttpResponse response = httpClient.execute(request);
+        CloseableHttpClient httpClient = getHttpClient();
 
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
             int code = response.getStatusLine().getStatusCode();
             Header[] headers = response.getAllHeaders();
 
@@ -239,10 +260,21 @@ public class HttpClientUtils {
                         }
                     }
                 }
-                return new Response<>(code, entity, contentType, charset, headers);
+
+                try {
+                    byte[] content = EntityUtils.toByteArray(entity);
+                    return new Response<>(code, content, contentType, charset, headers);
+                } finally {
+                    try {
+                        EntityUtils.consume(response.getEntity());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
             return new Response<String>(code, headers);
         }
+
     }
 
     /**

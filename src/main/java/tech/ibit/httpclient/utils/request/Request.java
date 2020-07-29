@@ -21,15 +21,6 @@ import java.util.Set;
 public class Request {
 
     /**
-     * 支持方法
-     */
-    private Set<RequestMethod> supportedMethods = new HashSet<RequestMethod>() {{
-        add(RequestMethod.GET);
-        add(RequestMethod.HEAD);
-        add(RequestMethod.OPTIONS);
-    }};
-
-    /**
      * 请求url
      */
     private String url;
@@ -95,7 +86,11 @@ public class Request {
      * @return 支持方法
      */
     public Set<RequestMethod> getSupportedMethods() {
-        return supportedMethods;
+        return new HashSet<RequestMethod>() {{
+            add(RequestMethod.GET);
+            add(RequestMethod.HEAD);
+            add(RequestMethod.OPTIONS);
+        }};
     }
 
     /**

@@ -14,16 +14,6 @@ import java.util.Set;
 public abstract class BaseEntityRequest extends Request {
 
     /**
-     * 支持方法
-     */
-    private Set<RequestMethod> supportedMethods = new HashSet<RequestMethod>() {{
-        add(RequestMethod.POST);
-        add(RequestMethod.PUT);
-        add(RequestMethod.PATCH);
-    }};
-
-
-    /**
      * 构造函数
      *
      * @param url    请求url
@@ -46,7 +36,11 @@ public abstract class BaseEntityRequest extends Request {
 
     @Override
     public Set<RequestMethod> getSupportedMethods() {
-        return supportedMethods;
+        return new HashSet<RequestMethod>() {{
+            add(RequestMethod.POST);
+            add(RequestMethod.PUT);
+            add(RequestMethod.PATCH);
+        }};
     }
 
     /**

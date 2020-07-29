@@ -6,10 +6,10 @@
 
     <groupId>tech.ibit</groupId>
     <artifactId>httpclient-util</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
 
-    <name>common-lang</name>
+    <name>httpclient-util</name>
     <url>https://github.com/ibit-tech/httpclient-util</url>
     <description>httpclient 工具类</description>
 
@@ -57,7 +57,7 @@
         <com.alibaba.fastjson>1.1.37</com.alibaba.fastjson>
         <junit.version>4.12</junit.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
-        <ibit-common-lang.version>1.1-SNAPSHOT</ibit-common-lang.version>
+        <ibit-common-lang.version>1.1</ibit-common-lang.version>
     </properties>
 
     <dependencies>
