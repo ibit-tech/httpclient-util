@@ -1,4 +1,4 @@
-package com.xiaobenma020.http.cert;
+package tech.ibit.httpclient.utils.cert;
 
 import java.io.BufferedReader;
 import java.io.File;
