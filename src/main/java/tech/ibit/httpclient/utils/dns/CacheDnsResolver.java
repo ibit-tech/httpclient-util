@@ -50,8 +50,8 @@ public class CacheDnsResolver implements DnsResolver {
             dnsCache.put(host, resolvedAddresses);
         }
 
-        if (this.log.isInfoEnabled()) {
-            this.log.info("Resolving " + host + " to " + Arrays.deepToString(resolvedAddresses));
+        if (this.log.isDebugEnabled()) {
+            this.log.debug("Resolving " + host + " to " + Arrays.deepToString(resolvedAddresses));
         }
         return resolvedAddresses;
     }
