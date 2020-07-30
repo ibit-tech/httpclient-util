@@ -1,9 +1,17 @@
-package com.xiaobenma020.http.exception;
+package tech.ibit.httpclient.utils.exception;
 
 /**
- * mailto:xiaobenma020@gmail.com
+ * 方法不支持
+ *
+ * @author 小ben马
  */
 public class MethodNotSupportException extends Exception {
+
+    /**
+     * 构造函数
+     *
+     * @param methodName 方法名称
+     */
     public MethodNotSupportException(String methodName) {
         super("Method " + methodName + " not support!");
     }

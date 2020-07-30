@@ -1,16 +1,20 @@
-package com.xiaobenma020.http;
+package tech.ibit.httpclient.utils;
 
-import com.xiaobenma020.http.request.RequestMethod;
-import com.xiaobenma020.http.request.UrlEncodedFormRequest;
-import com.xiaobenma020.http.response.Response;
+import org.junit.Ignore;
 import org.junit.Test;
+import tech.ibit.httpclient.utils.request.RequestMethod;
+import tech.ibit.httpclient.utils.request.UrlEncodedFormRequest;
+import tech.ibit.httpclient.utils.response.Response;
 
 /**
- * mailto:xiaobenma020@gmail.com
+ * HttpClient工具类测试
+ *
+ * @author 小ben马
  */
-public class HttpClientUtilTest {
+public class HttpClientUtilsTest {
 
     @Test
+    @Ignore
     public void doResponse() throws Exception {
         UrlEncodedFormRequest request = new UrlEncodedFormRequest("https://xxx.com/login", RequestMethod.POST);
 
@@ -22,10 +26,10 @@ public class HttpClientUtilTest {
         request.addUrlParam("version", "v1");
 
         //ssl
-        request.setUseSSL(true);
+        request.setSecured(true);
 
-        Response response = HttpClientUtil.doRequest(request);
-        System.out.println(response.getResponseText()); //response text
+        Response response = HttpClientUtils.doRequest(request, true);
+        System.out.println(response.getContent()); //response text
         System.out.println(response.getCode()); //response code
         System.out.println(response.getHeader("Set-Cookie"));
     }

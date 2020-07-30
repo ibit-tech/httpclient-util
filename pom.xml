@@ -4,19 +4,60 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.xiaobenma020</groupId>
+    <groupId>tech.ibit</groupId>
     <artifactId>httpclient-util</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1</version>
 
+
+    <name>httpclient-util</name>
+    <url>https://github.com/ibit-tech/httpclient-util</url>
+    <description>httpclient 工具类</description>
+
+    <scm>
+        <url>https://github.com/ibit-tech/httpclient-util</url>
+        <connection>scm:git:https://github.com/ibit-tech/httpclient-util.git</connection>
+    </scm>
+
+    <organization>
+        <name>IBIT程序猿</name>
+        <url>https://github.com/ibit-tech</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>ibit-tech</id>
+            <name>IBIT程序猿</name>
+            <email>ibit_tech@aliyun.com</email>
+        </developer>
+
+        <developer>
+            <id>xiaobenma020</id>
+            <name>xiaobenma020</name>
+            <email>xiaobenma020@gmail.com</email>
+        </developer>
+    </developers>
+
+
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
-        <jdkLevel>1.8</jdkLevel>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <gpg.skip>false</gpg.skip>
+        <javadoc.skip>false</javadoc.skip>
         <httpcomponents.httpclient.version>4.5.2</httpcomponents.httpclient.version>
         <httpcomponents.httpmime.version>4.5.2</httpcomponents.httpmime.version>
-        <commons-lang.version>2.6</commons-lang.version>
         <com.alibaba.fastjson>1.1.37</com.alibaba.fastjson>
         <junit.version>4.12</junit.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+        <ibit-common-lang.version>1.2</ibit-common-lang.version>
     </properties>
 
     <dependencies>
@@ -39,15 +80,17 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>${commons-lang.version}</version>
+            <groupId>tech.ibit</groupId>
+            <artifactId>common-lang</artifactId>
+            <version>${ibit-common-lang.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>${com.alibaba.fastjson}</version>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -58,17 +101,90 @@
 
 
     <build>
+
+        <finalName>httpclient-util</finalName>
+
         <plugins>
-            <!--指定编译级别-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
-                    <source>${jdkLevel}</source>
-                    <target>${jdkLevel}</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skip>${javadoc.skip}</skip>
+                    <show>public</show>
+                    <charset>UTF-8</charset>
+                    <encoding>UTF-8</encoding>
+                    <docencoding>UTF-8</docencoding>
+                    <links>
+                        <link>http://docs.oracle.com/javase/8/docs/api</link>
+                    </links>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <version>1.6</version>
+                <configuration>
+                    <skip>${gpg.skip}</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
 </project>
