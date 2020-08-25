@@ -1,5 +1,6 @@
 package tech.ibit.httpclient.utils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HeaderElementIterator;
@@ -38,6 +39,8 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * HttpClient工具类
@@ -60,6 +63,11 @@ public class HttpClientUtils {
      * https
      */
     private static final String PROTOCOL_HTTPS = "https";
+
+    /**
+     * charset正则表达式
+     */
+    public static final String REGEX_CHARSET = "charset=([a-zA-Z0-9-]+);?";
 
     /**
      * 它是线程安全的，所有的线程都可以使用它一起发送http请求
@@ -242,11 +250,16 @@ public class HttpClientUtils {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
 
-                //content encoding
-                String charset = (null == entity.getContentEncoding()) ? defaultCharset : entity.getContentEncoding().getValue();
-
                 //content type
                 String contentType = (null == entity.getContentType()) ? "" : entity.getContentType().getValue();
+
+                //content encoding
+                String charset = (null == entity.getContentEncoding()) ? null : entity.getContentEncoding().getValue();
+                if (null == charset) {
+                    charset = find(contentType, REGEX_CHARSET);
+                    charset = null == charset ? defaultCharset : charset;
+                }
+
 
                 if (convert2Text) {
                     try {
@@ -275,6 +288,25 @@ public class HttpClientUtils {
             return new Response<String>(code, headers);
         }
 
+    }
+
+    /**
+     * 查找字符串
+     *
+     * @param str   字符串
+     * @param regex 正则表达式
+     * @return 查找到的字符串
+     */
+    private static String find(String str, String regex) {
+        if (StringUtils.isBlank(str)) {
+            return null;
+        }
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
     /**
