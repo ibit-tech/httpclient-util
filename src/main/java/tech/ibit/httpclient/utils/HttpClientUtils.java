@@ -123,6 +123,7 @@ public class HttpClientUtils {
                 .setConnectTimeout(properties.getConnectTimeout())
                 .setConnectionRequestTimeout(properties.getConnectionRequestTimeout())
                 .setSocketTimeout(properties.getSocketTimeout())
+                .setRedirectsEnabled(properties.isHandleRedirects())
                 .build();
 
         // socket 配置

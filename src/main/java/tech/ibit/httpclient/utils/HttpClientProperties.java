@@ -78,6 +78,11 @@ public class HttpClientProperties {
     private boolean requestSentRetryEnabled = false;
 
     /**
+     * 处理重定向
+     */
+    private boolean handleRedirects = true;
+
+    /**
      * Gets the value of connectTimeout
      *
      * @return the value of connectTimeout
@@ -322,5 +327,52 @@ public class HttpClientProperties {
      */
     public void setRetryCount(int retryCount) {
         this.retryCount = retryCount;
+    }
+
+    /**
+     * Gets the value of retryCount
+     *
+     * @return the value of retryCount
+     */
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    /**
+     * Gets the value of requestSentRetryEnabled
+     *
+     * @return the value of requestSentRetryEnabled
+     */
+    public boolean isRequestSentRetryEnabled() {
+        return requestSentRetryEnabled;
+    }
+
+    /**
+     * Sets the requestSentRetryEnabled
+     * <p>You can use getRequestSentRetryEnabled() to get the value of requestSentRetryEnabled</p>
+     *
+     * @param requestSentRetryEnabled requestSentRetryEnabled
+     */
+    public void setRequestSentRetryEnabled(boolean requestSentRetryEnabled) {
+        this.requestSentRetryEnabled = requestSentRetryEnabled;
+    }
+
+    /**
+     * Gets the value of handleRedirects
+     *
+     * @return the value of handleRedirects
+     */
+    public boolean isHandleRedirects() {
+        return handleRedirects;
+    }
+
+    /**
+     * Sets the handleRedirects
+     * <p>You can use getHandleRedirects() to get the value of handleRedirects</p>
+     *
+     * @param handleRedirects handleRedirects
+     */
+    public void setHandleRedirects(boolean handleRedirects) {
+        this.handleRedirects = handleRedirects;
     }
 }
