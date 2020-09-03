@@ -21,6 +21,10 @@ public class Response<T> {
      */
     private int code;
 
+    /**
+     * 真实的uri
+     */
+    private UriEntity realUri;
 
     /**
      * Content-Type
@@ -48,31 +52,45 @@ public class Response<T> {
      * @param code 返回码
      */
     public Response(int code) {
-        this(code, null, null, null, null);
+        this(code, null);
     }
 
     /**
      * 构造函数
      *
      * @param code    返回码
+     * @param realUri 真实的uri
+     */
+    public Response(int code, UriEntity realUri) {
+        this(code, realUri, null, null, null, null);
+    }
+
+    /**
+     * 构造函数
+     *
+     * @param code    返回码
+     * @param realUri 真实的uri
      * @param headers 返回头部
      */
-    public Response(int code, Header[] headers) {
-        this(code, null, null, null, headers);
+    public Response(int code, UriEntity realUri, Header[] headers) {
+        this(code, realUri, null, null, null, headers);
     }
 
     /**
      * 构造函数
      *
      * @param code            返回码
+     * @param realUri         真实的uri
      * @param content         返回内容
      * @param contentType     Content-Type
      * @param contentEncoding 编码
      * @param headers         头部信息
      */
-    public Response(int code, T content, String contentType
+    public Response(int code, UriEntity realUri,
+                    T content, String contentType
             , String contentEncoding, Header[] headers) {
         this.code = code;
+        this.realUri = realUri;
         this.content = content;
         this.contentType = StringUtils.trimToEmpty(contentType);
         this.contentEncoding = StringUtils.trimToEmpty(contentEncoding);
@@ -191,5 +209,24 @@ public class Response<T> {
      */
     public boolean isSuccess() {
         return HttpServletResponse.SC_OK == code;
+    }
+
+    /**
+     * Gets the value of realUri
+     *
+     * @return the value of realUri
+     */
+    public UriEntity getRealUri() {
+        return realUri;
+    }
+
+    /**
+     * Sets the realUri
+     * <p>You can use getRealUri() to get the value of realUri</p>
+     *
+     * @param realUri realUri
+     */
+    public void setRealUri(UriEntity realUri) {
+        this.realUri = realUri;
     }
 }

@@ -1,15 +1,14 @@
 package tech.ibit.httpclient.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HeaderElement;
-import org.apache.http.HeaderElementIterator;
-import org.apache.http.HttpEntity;
+import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.config.SocketConfig;
@@ -31,13 +30,17 @@ import tech.ibit.httpclient.utils.exception.MethodNotSupportException;
 import tech.ibit.httpclient.utils.request.BaseEntityRequest;
 import tech.ibit.httpclient.utils.request.Request;
 import tech.ibit.httpclient.utils.response.Response;
+import tech.ibit.httpclient.utils.response.UriEntity;
 
 import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -196,6 +199,9 @@ public class HttpClientUtils {
      * @return response
      */
     public static Response doRequest(Request request, boolean convert2Text) {
+        HttpClientContext context = new HttpClientContext();
+
+
         try {
             HttpRequestBase baseRequest = request.getHttpRequest();
 
@@ -209,13 +215,27 @@ public class HttpClientUtils {
                 ((HttpEntityEnclosingRequestBase) baseRequest).setEntity(((BaseEntityRequest) request).getEntity());
             }
 
-            return getResponse(baseRequest, request.getResponseDefaultCharset(), convert2Text);
+            return getResponse(baseRequest, context, request.getResponseDefaultCharset(), convert2Text);
 
         } catch (IOException e) {
             e.printStackTrace();
-            return getError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            return getError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, request.getUrl(), e.getMessage());
         } catch (MethodNotSupportException mnse) {
-            return getError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, mnse.getMessage());
+            return getError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, request.getUrl(), mnse.getMessage());
+        }
+    }
+
+    /**
+     * 获取uri
+     *
+     * @param url url
+     * @return uri
+     */
+    private static URI getURI(String url) {
+        try {
+            return new URI(url);
+        } catch (URISyntaxException e) {
+            return null;
         }
     }
 
@@ -226,26 +246,33 @@ public class HttpClientUtils {
      * @param errorMsg 错误信息
      * @return 错误信息Response
      */
-    private static Response<String> getError(int code, String errorMsg) {
-        return new Response<>(code, errorMsg, null, null, null);
+    private static Response<String> getError(int code, String url, String errorMsg)  {
+        try {
+            URI uri = new URI(url);
+            return new Response<>(code, new UriEntity(uri), errorMsg, null, null, null);
+        } catch (URISyntaxException e) {
+            return new Response<>(code, new UriEntity(null), errorMsg, null, null, null);
+        }
     }
 
     /**
      * 获取Response
      *
      * @param request        请求
+     * @param context        请求上下文
      * @param defaultCharset 默认编码
      * @param convert2Text   结果是否返回文本
      * @return Response
      * @throws IOException IO异常
      */
-    private static Response getResponse(HttpUriRequest request
+    private static Response getResponse(HttpUriRequest request, HttpClientContext context
             , String defaultCharset, boolean convert2Text) throws IOException {
 
         CloseableHttpClient httpClient = getHttpClient();
 
-        try (CloseableHttpResponse response = httpClient.execute(request)) {
+        try (CloseableHttpResponse response = httpClient.execute(request, context)) {
             int code = response.getStatusLine().getStatusCode();
+            UriEntity realUri = getRealUri(request.getURI(), context);
             Header[] headers = response.getAllHeaders();
 
             HttpEntity entity = response.getEntity();
@@ -265,7 +292,7 @@ public class HttpClientUtils {
                 if (convert2Text) {
                     try {
                         String content = EntityUtils.toString(entity, defaultCharset);
-                        return new Response<>(code, content, contentType, charset, headers);
+                        return new Response<>(code, realUri, content, contentType, charset, headers);
                     } finally {
                         try {
                             EntityUtils.consume(response.getEntity());
@@ -277,7 +304,7 @@ public class HttpClientUtils {
 
                 try {
                     byte[] content = EntityUtils.toByteArray(entity);
-                    return new Response<>(code, content, contentType, charset, headers);
+                    return new Response<>(code, realUri, content, contentType, charset, headers);
                 } finally {
                     try {
                         EntityUtils.consume(response.getEntity());
@@ -286,9 +313,30 @@ public class HttpClientUtils {
                     }
                 }
             }
-            return new Response<String>(code, headers);
+            return new Response<String>(code, realUri, headers);
         }
 
+    }
+
+    /**
+     * 获取真实的uri
+     *
+     * @param uri     请求uri
+     * @param context http上下文
+     * @return 真实的uri
+     */
+    private static UriEntity getRealUri(URI uri, HttpClientContext context) {
+        HttpHost target = context.getTargetHost();
+        List<URI> redirectLocations = context.getRedirectLocations();
+        boolean isRedirect = null != redirectLocations && !redirectLocations.isEmpty();
+        URI location;
+        try {
+            location = URIUtils.resolve(uri, target, redirectLocations);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return new UriEntity(uri, isRedirect);
+        }
+        return new UriEntity(location, isRedirect);
     }
 
     /**
