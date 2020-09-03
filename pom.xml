@@ -6,7 +6,7 @@
 
     <groupId>tech.ibit</groupId>
     <artifactId>httpclient-util</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5</version>
 
 
     <name>httpclient-util</name>
